@@ -13,10 +13,10 @@ public class BooleanExpressionsTest {
     assertTrue(
       new And(
         new Or(
-          new Eq<String>(new Const<String>("ahoj"), new Const<String>("hello")),
-          new Lte<Integer>(new Const<Integer>(5), new Const<Integer>(5))
+          new Eq<>(new Const<>("ahoj"), new Const<>("hello")),
+          new Lte<>(new Const<>(5), new Const<>(5))
         ),
-        new Gt<Integer>(new Const<Integer>(3), new Const<Integer>(1))
+        new Gt<>(new Const<>(3), new Const<>(1))
       ).evaluate()
     );
   }
