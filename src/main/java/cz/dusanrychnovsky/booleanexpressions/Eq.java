@@ -10,6 +10,10 @@ public class Eq<T> implements Expression {
     this.right = right;
   }
 
+  public Eq(T left, T right) {
+    this(new Const<>(left), new Const<>(right));
+  }
+
   public boolean evaluate() {
     return left.getValue().equals(right.getValue());
   }

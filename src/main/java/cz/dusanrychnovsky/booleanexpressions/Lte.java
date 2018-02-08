@@ -10,6 +10,10 @@ public class Lte<T extends Comparable<T>> implements Expression {
     this.right = right;
   }
 
+  public Lte(T left, T right) {
+    this(new Const<>(left), new Const<>(right));
+  }
+
   public boolean evaluate() {
     return left.getValue().compareTo(right.getValue()) <= 0;
   }
