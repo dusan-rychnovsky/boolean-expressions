@@ -58,4 +58,19 @@ public class BooleanExpressionsTest {
       ).evaluate()
     );
   }
+
+  @Test
+  public void addDaysExpression() {
+    assertTrue(
+      new Eq<>(
+        new AddDays(
+          new LocalDate(2017, 5, 25),
+          10
+        ),
+        new Const<>(
+          new LocalDate(2017, 6, 4)
+        )
+      ).evaluate()
+    );
+  }
 }
