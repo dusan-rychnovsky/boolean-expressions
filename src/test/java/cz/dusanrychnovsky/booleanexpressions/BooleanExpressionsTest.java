@@ -32,4 +32,17 @@ public class BooleanExpressionsTest {
       ).evaluate()
     );
   }
+
+  @Test
+  public void monthDiffExpression() {
+    assertTrue(
+      new Eq<>(
+        new MonthDiff(
+          new LocalDate(2012, 5, 10),
+          new LocalDate(2017, 7, 4)
+        ),
+        new Const<>(61)
+      ).evaluate()
+    );
+  }
 }
