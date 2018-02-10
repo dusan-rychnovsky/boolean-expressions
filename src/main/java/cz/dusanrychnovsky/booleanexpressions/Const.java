@@ -1,6 +1,6 @@
 package cz.dusanrychnovsky.booleanexpressions;
 
-public class Const<T> {
+public class Const<T> implements Value<T> {
 
   private final T value;
 
@@ -8,6 +8,7 @@ public class Const<T> {
     this.value = value;
   }
 
+  @Override
   public T getValue() {
     return this.value;
   }

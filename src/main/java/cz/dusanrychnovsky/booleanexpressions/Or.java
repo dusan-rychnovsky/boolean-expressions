@@ -10,6 +10,7 @@ public class Or implements Expression {
     this.right = right;
   }
 
+  @Override
   public boolean evaluate() {
     return left.evaluate() || right.evaluate();
   }
