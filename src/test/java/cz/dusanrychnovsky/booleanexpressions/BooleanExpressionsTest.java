@@ -45,4 +45,17 @@ public class BooleanExpressionsTest {
       ).evaluate()
     );
   }
+
+  @Test
+  public void yearDiffExpression() {
+    assertTrue(
+      new Lte<>(
+        new YearDiff(
+          new LocalDate(2012, 5, 10),
+          new LocalDate(2017, 7, 4)
+        ),
+        new Const<>(5)
+      ).evaluate()
+    );
+  }
 }

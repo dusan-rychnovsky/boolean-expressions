@@ -1,20 +1,20 @@
 package cz.dusanrychnovsky.booleanexpressions;
 
 import org.joda.time.LocalDate;
-import org.joda.time.Months;
+import org.joda.time.Years;
 
-public class MonthDiff implements Value<Integer> {
+public class YearDiff implements Value<Integer> {
 
   private final LocalDate left;
   private final LocalDate right;
 
-  public MonthDiff(LocalDate left, LocalDate right) {
+  public YearDiff(LocalDate left, LocalDate right) {
     this.left = left;
     this.right = right;
   }
 
   @Override
   public Integer getValue() {
-    return Months.monthsBetween(left, right).getMonths();
+    return Years.yearsBetween(left, right).getYears();
   }
 }
