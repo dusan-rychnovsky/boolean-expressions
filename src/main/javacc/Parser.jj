@@ -1,0 +1,42 @@
+options {
+  STATIC = false;
+}
+
+PARSER_BEGIN(Parser)
+  package cz.dusanrychnovsky.booleanexpressions;
+
+  import java.io.*;
+  import static java.nio.charset.StandardCharsets.UTF_8;
+
+  public class Parser {
+
+    public Parser() {
+      this(new StringReader(""));
+    }
+
+    public int parseExpression(InputStream in) throws ParseException {
+      ReInit(in);
+      return Start();
+    }
+
+    public int parseExpression(String str) throws ParseException {
+      return parseExpression(new ByteArrayInputStream(str.getBytes(UTF_8)));
+    }
+  }
+PARSER_END(Parser)
+
+SKIP : { " " }
+TOKEN : { < LPAR : "(" > }
+TOKEN : { < RPAR : ")" > }
+
+int Start():
+{}
+{
+  { int result = 0; }
+  (
+    <LPAR>
+    { result++; }
+  )+
+  <EOF>
+  { return result; }
+}
