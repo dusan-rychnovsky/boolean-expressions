@@ -31,14 +31,83 @@ PARSER_BEGIN(Parser)
 PARSER_END(Parser)
 
 SKIP : { " " }
+TOKEN : { < AND : "AND" > }
+TOKEN : { < OR : "OR" > }
 TOKEN : { < EQ : "=" > }
 TOKEN : { < LT : "<" > }
 TOKEN : { < GT : ">" > }
 TOKEN : { < GTE : ">=" > }
 TOKEN : { < LTE : "<=" > }
 TOKEN : { < CINT : (["0"-"9"])+ > }
+TOKEN : { < LPAR : "(" > }
+TOKEN : { < RPAR : ")" > }
 
 Expression Start():
+{ }
+{
+  { return Expression(); }
+  <EOF>
+}
+
+Expression Expression():
+{
+    Expression left, right = null;
+}
+{
+  { left = Term(); }
+  (
+    <AND>
+    { right = Term(); }
+  )?
+
+  {
+    if (right != null) {
+      return new And(left, right);
+    }
+    else {
+      return left;
+    }
+  }
+}
+
+Expression Term():
+{
+  Expression left, right = null;
+}
+{
+  { left = Factor(); }
+  (
+    <OR>
+    { right = Factor(); }
+  )?
+
+  {
+    if (right != null) {
+      return new Or(left, right);
+    }
+    else {
+      return left;
+    }
+  }
+}
+
+Expression Factor():
+{
+  Expression e;
+}
+{
+  (
+    <LPAR>
+    { e = Expression(); }
+    <RPAR>
+  |
+    { e = Relation(); }
+  )
+
+  { return e; }
+}
+
+Expression Relation():
 {
   Token t;
   Operator op;
