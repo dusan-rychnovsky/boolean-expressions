@@ -1,3 +1,4 @@
+
 options {
   STATIC = false;
 }
@@ -14,29 +15,33 @@ PARSER_BEGIN(Parser)
       this(new StringReader(""));
     }
 
-    public int parseExpression(InputStream in) throws ParseException {
+    public Expression parseExpression(InputStream in) throws ParseException {
       ReInit(in);
       return Start();
     }
 
-    public int parseExpression(String str) throws ParseException {
+    public Expression parseExpression(String str) throws ParseException {
       return parseExpression(new ByteArrayInputStream(str.getBytes(UTF_8)));
     }
   }
 PARSER_END(Parser)
 
 SKIP : { " " }
-TOKEN : { < LPAR : "(" > }
-TOKEN : { < RPAR : ")" > }
+TOKEN : { < EQ : "=" > }
+TOKEN : { < CINT : (["0"-"9"])+ > }
 
-int Start():
-{}
+Expression Start():
 {
-  { int result = 0; }
-  (
-    <LPAR>
-    { result++; }
-  )+
-  <EOF>
-  { return result; }
+  Token t;
+}
+{
+  t = <CINT>
+  { int left = Integer.parseInt(t.image); }
+
+  <EQ>
+
+  t = <CINT>
+  { int right = Integer.parseInt(t.image); }
+
+  { return new Eq<Integer>(new Const<Integer>(left), new Const<Integer>(right)); }
 }
