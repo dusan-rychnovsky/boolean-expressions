@@ -18,4 +18,20 @@ public class Gte<T extends Comparable<T>> implements Expression {
   public boolean evaluate() {
     return left.getValue().compareTo(right.getValue()) >= 0;
   }
+
+  @Override
+  public int hashCode() {
+    return left.hashCode() + right.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof Gte)) {
+      return false;
+    }
+    Gte<T> other = (Gte<T>) obj;
+    return
+      left.equals(other.left) &&
+      right.equals(other.right);
+  }
 }

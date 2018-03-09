@@ -32,6 +32,6 @@ public class Gt<T extends Comparable<T>> implements Expression {
     Gt<T> other = (Gt<T>) obj;
     return
       left.equals(other.left) &&
-        right.equals(other.right);
+      right.equals(other.right);
   }
 }
