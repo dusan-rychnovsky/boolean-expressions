@@ -25,7 +25,7 @@ PARSER_BEGIN(Parser)
     }
 
     private enum Operator {
-      EQ, LT
+      EQ, LT, GT
     }
   }
 PARSER_END(Parser)
@@ -33,6 +33,7 @@ PARSER_END(Parser)
 SKIP : { " " }
 TOKEN : { < EQ : "=" > }
 TOKEN : { < LT : "<" > }
+TOKEN : { < GT : ">" > }
 TOKEN : { < CINT : (["0"-"9"])+ > }
 
 Expression Start():
@@ -50,6 +51,9 @@ Expression Start():
   |
     <LT>
     { op = Operator.LT; }
+  |
+    <GT>
+    { op = Operator.GT; }
   )
 
   t = <CINT>
@@ -59,6 +63,7 @@ Expression Start():
     switch (op) {
       case EQ: return new Eq<Integer>(left, right);
       case LT: return new Lt<Integer>(left, right);
+      case GT: return new Gt<Integer>(left, right);
       default:
         throw new AssertionError("Unexpected operator: " + op);
     }
