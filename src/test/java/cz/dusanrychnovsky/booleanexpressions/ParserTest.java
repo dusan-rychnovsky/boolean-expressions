@@ -28,4 +28,9 @@ public class ParserTest {
   public void gte() throws ParseException {
     assertEquals(new Gte<>(42, 15), parser.parseExpression("42 >= 15"));
   }
+
+  @Test
+  public void Lte() throws ParseException {
+    assertEquals(new Lte<>(42, 15), parser.parseExpression("42 <= 15"));
+  }
 }
