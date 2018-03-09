@@ -3,32 +3,32 @@ options {
   STATIC = false;
 }
 
-PARSER_BEGIN(Parser)
+PARSER_BEGIN(ExpressionParser)
   package cz.dusanrychnovsky.booleanexpressions;
 
   import java.io.*;
   import static java.nio.charset.StandardCharsets.UTF_8;
 
-  public class Parser {
+  public class ExpressionParser {
 
-    public Parser() {
+    public ExpressionParser() {
       this(new StringReader(""));
     }
 
-    public Expression parseExpression(InputStream in) throws ParseException {
+    public Expression parse(InputStream in) throws ParseException {
       ReInit(in);
       return Start();
     }
 
-    public Expression parseExpression(String str) throws ParseException {
-      return parseExpression(new ByteArrayInputStream(str.getBytes(UTF_8)));
+    public Expression parse(String str) throws ParseException {
+      return parse(new ByteArrayInputStream(str.getBytes(UTF_8)));
     }
 
     private enum Operator {
       EQ, LT, GT, GTE, LTE
     }
   }
-PARSER_END(Parser)
+PARSER_END(ExpressionParser)
 
 SKIP : { " " }
 TOKEN : { < AND : "AND" > }
