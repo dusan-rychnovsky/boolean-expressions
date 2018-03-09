@@ -13,4 +13,9 @@ public class ParserTest {
   public void eq() throws ParseException {
     assertEquals(new Eq<>(42, 15), parser.parseExpression("42 = 15"));
   }
+
+  @Test
+  public void lt() throws ParseException {
+    assertEquals(new Lt<>(42, 15), parser.parseExpression("42 < 15"));
+  }
 }

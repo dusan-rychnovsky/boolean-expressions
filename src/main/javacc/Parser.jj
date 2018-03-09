@@ -23,25 +23,44 @@ PARSER_BEGIN(Parser)
     public Expression parseExpression(String str) throws ParseException {
       return parseExpression(new ByteArrayInputStream(str.getBytes(UTF_8)));
     }
+
+    private enum Operator {
+      EQ, LT
+    }
   }
 PARSER_END(Parser)
 
 SKIP : { " " }
 TOKEN : { < EQ : "=" > }
+TOKEN : { < LT : "<" > }
 TOKEN : { < CINT : (["0"-"9"])+ > }
 
 Expression Start():
 {
   Token t;
+  Operator op;
 }
 {
   t = <CINT>
   { int left = Integer.parseInt(t.image); }
 
-  <EQ>
+  (
+    <EQ>
+    { op = Operator.EQ; }
+  |
+    <LT>
+    { op = Operator.LT; }
+  )
 
   t = <CINT>
   { int right = Integer.parseInt(t.image); }
 
-  { return new Eq<Integer>(new Const<Integer>(left), new Const<Integer>(right)); }
+  {
+    switch (op) {
+      case EQ: return new Eq(left, right);
+      case LT: return new Lt(left, right);
+      default:
+        throw new AssertionError("Unexpected operator: " + op);
+    }
+  }
 }
