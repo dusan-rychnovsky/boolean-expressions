@@ -57,8 +57,8 @@ Expression Start():
 
   {
     switch (op) {
-      case EQ: return new Eq(left, right);
-      case LT: return new Lt(left, right);
+      case EQ: return new Eq<Integer>(left, right);
+      case LT: return new Lt<Integer>(left, right);
       default:
         throw new AssertionError("Unexpected operator: " + op);
     }
