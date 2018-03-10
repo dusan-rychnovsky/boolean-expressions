@@ -51,6 +51,38 @@ PARSER_BEGIN(ExpressionParser)
         return value;
       }
     }
+
+    private class RelationBuilder {
+      private Expression build(Operator op, Literal left, Literal right) throws ParseException {
+
+        if (left.getType() != right.getType()) {
+          throw new ParseException("Incompatible types " + left.getType() + " vs " + right.getType());
+        }
+
+        Type type = left.getType();
+
+        switch (type) {
+          case INT:
+            return buildComp(op, (int) left.getValue(), (int) right.getValue());
+          case DATE:
+            return buildComp(op, (ReadablePartial) left.getValue(), (ReadablePartial) right.getValue());
+          default:
+            throw new AssertionError("Unexpected type: " + type);
+        }
+      }
+
+      private <T extends Comparable<T>> Expression buildComp(Operator op, T left, T right) {
+        switch (op) {
+          case EQ: return new Eq<T>(left, right);
+          case LT: return new Lt<T>(left, right);
+          case LTE: return new Lte<T>(left, right);
+          case GT: return new Gt<T>(left, right);
+          case GTE: return new Gte<T>(left, right);
+          default:
+            throw new AssertionError("Unexpected operator: " + op);
+        }
+      }
+    }
   }
 PARSER_END(ExpressionParser)
 
@@ -159,42 +191,9 @@ Expression Relation():
     { op = Operator.LTE; }
   )
 
-  { right = Literal(); }
-
   {
-    if (left.getType() != right.getType()) {
-      throw new ParseException("Incompatible types " + left.getType() + " vs " + right.getType());
-    }
-
-    Type type = left.getType();
-    switch (type) {
-      case INT:
-        int leftInt = (int) left.getValue();
-        int rightInt = (int) right.getValue();
-        switch (op) {
-          case EQ: return new Eq<Integer>(leftInt, rightInt);
-          case LT: return new Lt<Integer>(leftInt, rightInt);
-          case LTE: return new Lte<Integer>(leftInt, rightInt);
-          case GT: return new Gt<Integer>(leftInt, rightInt);
-          case GTE: return new Gte<Integer>(leftInt, rightInt);
-          default:
-            throw new AssertionError("Unexpected operator: " + op);
-        }
-      case DATE:
-        LocalDate leftDate = (LocalDate) left.getValue();
-        LocalDate rightDate = (LocalDate) right.getValue();
-        switch (op) {
-          case EQ: return new Eq<ReadablePartial>(leftDate, rightDate);
-          case LT: return new Lt<ReadablePartial>(leftDate, rightDate);
-          case LTE: return new Lte<ReadablePartial>(leftDate, rightDate);
-          case GT: return new Gt<ReadablePartial>(leftDate, rightDate);
-          case GTE: return new Gte<ReadablePartial>(leftDate, rightDate);
-          default:
-            throw new AssertionError("Unexpected operator: " + op);
-        }
-      default:
-        throw new AssertionError("Unexpected type: " + type);
-    }
+    right = Literal();
+    return new RelationBuilder().build(op, left, right);
   }
 }
 
