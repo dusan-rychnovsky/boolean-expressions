@@ -1,96 +1,27 @@
 package cz.dusanrychnovsky.booleanexpressions;
 
-import org.joda.time.LocalDate;
+import org.junit.Assert;
 import org.junit.Test;
+
 import static org.junit.Assert.assertTrue;
 
 public class BooleanExpressionsTest {
 
-  @Test
-  public void simpleExpression()
-  {
-    assertTrue(
-      new And(
-        new Or(
-          new Eq<>("ahoj", "hello"),
-          new Lte<>(5, 5)
-        ),
-        new Gt<>(3, 1)
-      ).evaluate()
-    );
-  }
+  private ExpressionParser parser = new ExpressionParser();
 
   @Test
-  public void dayDiffExpression() {
-    assertTrue(
-      new Eq<>(
-        new DayDiff(
-          new LocalDate(2012, 5, 10),
-          new LocalDate(2017, 7, 4)
-        ),
-        new Const<>(1881)
-      ).evaluate()
-    );
+  public void expressions() {
+    assertTrue(evaluate("(3 < 5) AND ((1 = 2) OR (5 = 5))"));
+    assertTrue(evaluate("DAYDIFF(2018-01-01, 2018-01-05) = 4 AND ADDDAYS(2018-01-01, 4) = DATE(2018-01-05)"));
+    assertTrue(evaluate("5 < 1 OR (5 = 1 OR 5 > 1)"));
   }
 
-  @Test
-  public void monthDiffExpression() {
-    assertTrue(
-      new Eq<>(
-        new MonthDiff(
-          new LocalDate(2012, 5, 10),
-          new LocalDate(2017, 7, 4)
-        ),
-        new Const<>(61)
-      ).evaluate()
-    );
-  }
-
-  @Test
-  public void yearDiffExpression() {
-    assertTrue(
-      new Lte<>(
-        new YearDiff(
-          new LocalDate(2012, 5, 10),
-          new LocalDate(2017, 7, 4)
-        ),
-        new Const<>(5)
-      ).evaluate()
-    );
-  }
-
-  @Test
-  public void addDaysExpression() {
-    assertTrue(
-      new Eq<>(
-        new AddDays(
-          new LocalDate(2017, 5, 25),
-          10
-        ),
-        new Const<>(
-          new LocalDate(2017, 6, 4)
-        )
-      ).evaluate()
-    );
-  }
-
-  @Test
-  public void dateEqExpression() {
-    assertTrue(
-      new Eq<>(
-        new LocalDate(2018, 1, 5),
-        new LocalDate(2018, 1, 5)
-      ).evaluate()
-    );
-  }
-
-  @Test
-  public void dateLtExpression() {
-    assertTrue(
-      new Lt<>(
-        new LocalDate(2018, 1, 5),
-        new LocalDate(2018, 2, 5)
-      ).evaluate()
-    );
+  private boolean evaluate(String expr) {
+    try {
+      return parser.parse(expr).evaluate();
+    }
+    catch (ParseException ex) {
+      throw new AssertionError(ex);
+    }
   }
 }
