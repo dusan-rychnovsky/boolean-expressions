@@ -1,5 +1,6 @@
 package cz.dusanrychnovsky.booleanexpressions;
 
+import org.joda.time.LocalDate;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
@@ -122,5 +123,32 @@ public class ExpressionParserTest {
       ),
       parser.parse("1 = 2 OR (3 = 4 AND 5 = 6)")
     );
+  }
+
+  @Test
+  public void dateEq() throws ParseException {
+    assertEquals(
+      new Eq<>(
+        new LocalDate(2018, 3, 1),
+        new LocalDate(2018, 3, 1)
+      ),
+      parser.parse("DATE(2018-03-01) = DATE(2018-03-01)")
+    );
+  }
+
+  @Test
+  public void dateLt() throws ParseException {
+    assertEquals(
+      new Lt<>(
+        new LocalDate(2018, 3, 1),
+        new LocalDate(2018, 3, 5)
+      ),
+      parser.parse("DATE(2018-03-01) < DATE(2018-03-05)")
+    );
+  }
+
+  @Test(expected = ParseException.class)
+  public void incompatibleTypes() throws ParseException {
+    parser.parse("DATE(2018-03-01) = 15");
   }
 }

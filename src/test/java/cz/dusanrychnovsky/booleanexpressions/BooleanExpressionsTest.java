@@ -73,4 +73,24 @@ public class BooleanExpressionsTest {
       ).evaluate()
     );
   }
+
+  @Test
+  public void dateEqExpression() {
+    assertTrue(
+      new Eq<>(
+        new LocalDate(2018, 1, 5),
+        new LocalDate(2018, 1, 5)
+      ).evaluate()
+    );
+  }
+
+  @Test
+  public void dateLtExpression() {
+    assertTrue(
+      new Lt<>(
+        new LocalDate(2018, 1, 5),
+        new LocalDate(2018, 2, 5)
+      ).evaluate()
+    );
+  }
 }

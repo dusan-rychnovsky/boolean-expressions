@@ -8,6 +8,8 @@ PARSER_BEGIN(ExpressionParser)
 
   import java.io.*;
   import static java.nio.charset.StandardCharsets.UTF_8;
+  import org.joda.time.LocalDate;
+  import org.joda.time.ReadablePartial;
 
   public class ExpressionParser {
 
@@ -27,6 +29,28 @@ PARSER_BEGIN(ExpressionParser)
     private enum Operator {
       EQ, LT, GT, GTE, LTE
     }
+
+    private enum Type {
+      INT, DATE
+    }
+
+    private class Literal {
+      private final Type type;
+      private final Object value;
+
+      public Literal(Type type, Object value) {
+        this.type = type;
+        this.value = value;
+      }
+
+      public Type getType() {
+        return type;
+      }
+
+      private Object getValue() {
+        return value;
+      }
+    }
   }
 PARSER_END(ExpressionParser)
 
@@ -41,6 +65,8 @@ TOKEN : { < LTE : "<=" > }
 TOKEN : { < CINT : (["0"-"9"])+ > }
 TOKEN : { < LPAR : "(" > }
 TOKEN : { < RPAR : ")" > }
+TOKEN : { < DATE : "DATE" > }
+TOKEN : { < CDATE : (["0"-"9"]){4}"-"(["0"-"9"]){2}"-"(["0"-"9"]){2} > }
 
 Expression Start():
 { }
@@ -111,10 +137,10 @@ Expression Relation():
 {
   Token t;
   Operator op;
+  Literal left, right;
 }
 {
-  t = <CINT>
-  { int left = Integer.parseInt(t.image); }
+  { left = Literal(); }
 
   (
     <EQ>
@@ -133,18 +159,68 @@ Expression Relation():
     { op = Operator.LTE; }
   )
 
-  t = <CINT>
-  { int right = Integer.parseInt(t.image); }
+  { right = Literal(); }
 
   {
-    switch (op) {
-      case EQ: return new Eq<Integer>(left, right);
-      case LT: return new Lt<Integer>(left, right);
-      case GT: return new Gt<Integer>(left, right);
-      case GTE: return new Gte<Integer>(left, right);
-      case LTE: return new Lte<Integer>(left, right);
+    if (left.getType() != right.getType()) {
+      throw new ParseException("Incompatible types " + left.getType() + " vs " + right.getType());
+    }
+
+    Type type = left.getType();
+    switch (type) {
+      case INT:
+        int leftInt = (int) left.getValue();
+        int rightInt = (int) right.getValue();
+        switch (op) {
+          case EQ: return new Eq<Integer>(leftInt, rightInt);
+          case LT: return new Lt<Integer>(leftInt, rightInt);
+          case LTE: return new Lte<Integer>(leftInt, rightInt);
+          case GT: return new Gt<Integer>(leftInt, rightInt);
+          case GTE: return new Gte<Integer>(leftInt, rightInt);
+          default:
+            throw new AssertionError("Unexpected operator: " + op);
+        }
+      case DATE:
+        LocalDate leftDate = (LocalDate) left.getValue();
+        LocalDate rightDate = (LocalDate) right.getValue();
+        switch (op) {
+          case EQ: return new Eq<ReadablePartial>(leftDate, rightDate);
+          case LT: return new Lt<ReadablePartial>(leftDate, rightDate);
+          case LTE: return new Lte<ReadablePartial>(leftDate, rightDate);
+          case GT: return new Gt<ReadablePartial>(leftDate, rightDate);
+          case GTE: return new Gte<ReadablePartial>(leftDate, rightDate);
+          default:
+            throw new AssertionError("Unexpected operator: " + op);
+        }
       default:
-        throw new AssertionError("Unexpected operator: " + op);
+        throw new AssertionError("Unexpected type: " + type);
     }
   }
+}
+
+Literal Literal():
+{
+  Token t;
+}
+{
+  (
+    t = <CINT>
+    {
+      return new Literal(
+        Type.INT,
+        Integer.parseInt(t.image)
+      );
+    }
+  |
+    <DATE>
+    <LPAR>
+    t = <CDATE>
+    <RPAR>
+    {
+      return new Literal(
+        Type.DATE,
+        new LocalDate(t.image)
+      );
+    }
+  )
 }
