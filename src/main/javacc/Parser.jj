@@ -93,6 +93,7 @@ TOKEN : { < CDATE : (["0"-"9"]){4}"-"(["0"-"9"]){2}"-"(["0"-"9"]){2} > }
 TOKEN : { < DAYDIFF : "DAYDIFF" > }
 TOKEN : { < MONTHDIFF : "MONTHDIFF" > }
 TOKEN : { < YEARDIFF : "YEARDIFF" > }
+TOKEN : { < ADDDAYS : "ADDDAYS" > }
 TOKEN : { < COMMA : "," > }
 
 Expression Start():
@@ -261,6 +262,22 @@ Leaf Leaf():
         new YearDiff(
           new LocalDate(t1.image),
           new LocalDate(t2.image)
+        )
+      );
+    }
+  |
+    <ADDDAYS>
+    <LPAR>
+    t1 = <CDATE>
+    <COMMA>
+    t2 = <CINT>
+    <RPAR>
+    {
+      return new Leaf(
+        Type.DATE,
+        new AddDays(
+          new LocalDate(t1.image),
+          Integer.parseInt(t2.image)
         )
       );
     }

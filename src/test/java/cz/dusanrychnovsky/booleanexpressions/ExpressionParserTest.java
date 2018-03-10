@@ -193,4 +193,18 @@ public class ExpressionParserTest {
       parser.parse("YEARDIFF(2018-01-05, 2028-10-01) = 4")
     );
   }
+
+  @Test
+  public void addDays() throws ParseException {
+    assertEquals(
+      new Eq<>(
+        new AddDays(
+          new LocalDate(2018, 1, 5),
+          10
+        ),
+        new Const<>(new LocalDate(2018, 1, 15))
+      ),
+      parser.parse("ADDDAYS(2018-01-05, 10) = DATE(2018-01-15)")
+    );
+  }
 }
