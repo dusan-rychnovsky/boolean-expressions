@@ -34,11 +34,11 @@ PARSER_BEGIN(ExpressionParser)
       INT, DATE
     }
 
-    private class Literal {
+    private class Leaf {
       private final Type type;
       private final Object value;
 
-      public Literal(Type type, Object value) {
+      public Leaf(Type type, Object value) {
         this.type = type;
         this.value = value;
       }
@@ -53,7 +53,7 @@ PARSER_BEGIN(ExpressionParser)
     }
 
     private class RelationBuilder {
-      private Expression build(Operator op, Literal left, Literal right) throws ParseException {
+      private Expression build(Operator op, Leaf left, Leaf right) throws ParseException {
 
         if (left.getType() != right.getType()) {
           throw new ParseException("Incompatible types " + left.getType() + " vs " + right.getType());
@@ -99,6 +99,7 @@ TOKEN : { < LPAR : "(" > }
 TOKEN : { < RPAR : ")" > }
 TOKEN : { < DATE : "DATE" > }
 TOKEN : { < CDATE : (["0"-"9"]){4}"-"(["0"-"9"]){2}"-"(["0"-"9"]){2} > }
+TOKEN : { < DAYDIFF : "DAYDIFF" > }
 
 Expression Start():
 { }
@@ -169,10 +170,10 @@ Expression Relation():
 {
   Token t;
   Operator op;
-  Literal left, right;
+  Leaf left, right;
 }
 {
-  { left = Literal(); }
+  { left = Leaf(); }
 
   (
     <EQ>
@@ -192,12 +193,12 @@ Expression Relation():
   )
 
   {
-    right = Literal();
+    right = Leaf();
     return new RelationBuilder().build(op, left, right);
   }
 }
 
-Literal Literal():
+Leaf Leaf():
 {
   Token t;
 }
@@ -205,7 +206,7 @@ Literal Literal():
   (
     t = <CINT>
     {
-      return new Literal(
+      return new Leaf(
         Type.INT,
         Integer.parseInt(t.image)
       );
@@ -216,7 +217,7 @@ Literal Literal():
     t = <CDATE>
     <RPAR>
     {
-      return new Literal(
+      return new Leaf(
         Type.DATE,
         new LocalDate(t.image)
       );
