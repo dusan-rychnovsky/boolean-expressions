@@ -151,4 +151,18 @@ public class ExpressionParserTest {
   public void incompatibleTypes() throws ParseException {
     parser.parse("DATE(2018-03-01) = 15");
   }
+
+  @Test
+  public void dayDiff() throws ParseException {
+    assertEquals(
+      new Eq<>(
+        new DayDiff(
+          new LocalDate(2018, 1, 5),
+          new LocalDate(2018, 1, 1)
+        ),
+        new Const<>(4)
+      ),
+      parser.parse("DAYDIFF(2018-01-05, 2018-01-01) = 4")
+    );
+  }
 }

@@ -34,11 +34,11 @@ PARSER_BEGIN(ExpressionParser)
       INT, DATE
     }
 
-    private class Leaf {
+    private class Leaf<T> {
       private final Type type;
-      private final Object value;
+      private final Value<T> value;
 
-      public Leaf(Type type, Object value) {
+      public Leaf(Type type, Value<T> value) {
         this.type = type;
         this.value = value;
       }
@@ -47,7 +47,7 @@ PARSER_BEGIN(ExpressionParser)
         return type;
       }
 
-      private Object getValue() {
+      private Value<T> getValue() {
         return value;
       }
     }
@@ -59,19 +59,10 @@ PARSER_BEGIN(ExpressionParser)
           throw new ParseException("Incompatible types " + left.getType() + " vs " + right.getType());
         }
 
-        Type type = left.getType();
-
-        switch (type) {
-          case INT:
-            return buildComp(op, (int) left.getValue(), (int) right.getValue());
-          case DATE:
-            return buildComp(op, (ReadablePartial) left.getValue(), (ReadablePartial) right.getValue());
-          default:
-            throw new AssertionError("Unexpected type: " + type);
-        }
+        return buildComp(op, left.getValue(), right.getValue());
       }
 
-      private <T extends Comparable<T>> Expression buildComp(Operator op, T left, T right) {
+      private <T extends Comparable<T>> Expression buildComp(Operator op, Value<T> left, Value<T> right) {
         switch (op) {
           case EQ: return new Eq<T>(left, right);
           case LT: return new Lt<T>(left, right);
@@ -100,6 +91,7 @@ TOKEN : { < RPAR : ")" > }
 TOKEN : { < DATE : "DATE" > }
 TOKEN : { < CDATE : (["0"-"9"]){4}"-"(["0"-"9"]){2}"-"(["0"-"9"]){2} > }
 TOKEN : { < DAYDIFF : "DAYDIFF" > }
+TOKEN : { < COMMA : "," > }
 
 Expression Start():
 { }
@@ -200,26 +192,42 @@ Expression Relation():
 
 Leaf Leaf():
 {
-  Token t;
+  Token t1, t2;
 }
 {
   (
-    t = <CINT>
+    t1 = <CINT>
     {
       return new Leaf(
         Type.INT,
-        Integer.parseInt(t.image)
+        new Const<Integer>(Integer.parseInt(t1.image))
       );
     }
   |
     <DATE>
     <LPAR>
-    t = <CDATE>
+    t1 = <CDATE>
     <RPAR>
     {
       return new Leaf(
         Type.DATE,
-        new LocalDate(t.image)
+        new Const<ReadablePartial>(new LocalDate(t1.image))
+      );
+    }
+  |
+    <DAYDIFF>
+    <LPAR>
+    t1 = <CDATE>
+    <COMMA>
+    t2 = <CDATE>
+    <RPAR>
+    {
+      return new Leaf(
+        Type.INT,
+        new DayDiff(
+          new LocalDate(t1.image),
+          new LocalDate(t2.image)
+        )
       );
     }
   )
