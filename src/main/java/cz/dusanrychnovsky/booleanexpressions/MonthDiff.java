@@ -17,4 +17,20 @@ public class MonthDiff implements Value<Integer> {
   public Integer getValue() {
     return Months.monthsBetween(left, right).getMonths();
   }
+
+  @Override
+  public int hashCode() {
+    return left.hashCode() + right.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof MonthDiff)) {
+      return false;
+    }
+    MonthDiff other = (MonthDiff) obj;
+    return
+      left.equals(other.left) &&
+      right.equals(other.right);
+  }
 }

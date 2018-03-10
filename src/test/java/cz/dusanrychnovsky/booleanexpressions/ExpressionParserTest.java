@@ -165,4 +165,32 @@ public class ExpressionParserTest {
       parser.parse("DAYDIFF(2018-01-05, 2018-01-01) = 4")
     );
   }
+
+  @Test
+  public void monthDiff() throws ParseException {
+    assertEquals(
+      new Eq<>(
+        new MonthDiff(
+          new LocalDate(2018, 1, 5),
+          new LocalDate(2018, 10, 1)
+        ),
+        new Const<>(4)
+      ),
+      parser.parse("MONTHDIFF(2018-01-05, 2018-10-01) = 4")
+    );
+  }
+
+  @Test
+  public void yearDiff() throws ParseException {
+    assertEquals(
+      new Eq<>(
+        new YearDiff(
+          new LocalDate(2018, 1, 5),
+          new LocalDate(2028, 10, 1)
+        ),
+        new Const<>(4)
+      ),
+      parser.parse("YEARDIFF(2018-01-05, 2028-10-01) = 4")
+    );
+  }
 }

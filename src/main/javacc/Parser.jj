@@ -91,6 +91,8 @@ TOKEN : { < RPAR : ")" > }
 TOKEN : { < DATE : "DATE" > }
 TOKEN : { < CDATE : (["0"-"9"]){4}"-"(["0"-"9"]){2}"-"(["0"-"9"]){2} > }
 TOKEN : { < DAYDIFF : "DAYDIFF" > }
+TOKEN : { < MONTHDIFF : "MONTHDIFF" > }
+TOKEN : { < YEARDIFF : "YEARDIFF" > }
 TOKEN : { < COMMA : "," > }
 
 Expression Start():
@@ -225,6 +227,38 @@ Leaf Leaf():
       return new Leaf(
         Type.INT,
         new DayDiff(
+          new LocalDate(t1.image),
+          new LocalDate(t2.image)
+        )
+      );
+    }
+  |
+    <MONTHDIFF>
+    <LPAR>
+    t1 = <CDATE>
+    <COMMA>
+    t2 = <CDATE>
+    <RPAR>
+    {
+      return new Leaf(
+        Type.INT,
+        new MonthDiff(
+          new LocalDate(t1.image),
+          new LocalDate(t2.image)
+        )
+      );
+    }
+  |
+    <YEARDIFF>
+    <LPAR>
+    t1 = <CDATE>
+    <COMMA>
+    t2 = <CDATE>
+    <RPAR>
+    {
+      return new Leaf(
+        Type.INT,
+        new YearDiff(
           new LocalDate(t1.image),
           new LocalDate(t2.image)
         )
